@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, abort
+from flask import Flask, jsonify, abort, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_restx import Resource, Api
 from flask_restx import fields
@@ -10,6 +10,7 @@ from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey
 from sqlalchemy import inspect
 from sqlalchemy.orm import sessionmaker
 import copy
+import requests
 
 
 import json
@@ -22,18 +23,54 @@ engine = create_engine('postgresql://root:root@dbbooking/main')
 Session = sessionmaker(bind = engine)
 session = Session()
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(100))
-    phone = db.Column(db.String(50))
-    email = db.Column(db.String(100))
+# class User(db.Model):
+#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     name = db.Column(db.String(100))
+#     phone = db.Column(db.String(50))
+#     email = db.Column(db.String(100))
 
     
 class Booking(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    userid = db.Column(db.Integer)
+    # userid = db.Column(db.Integer)
+    username = db.Column(db.String(100))
     ticketid = db.Column(db.Integer)
     
+
+@app.route('/timeslots/<timeslotsid>/order', methods = ['POST'])
+def book_ticket(timeslotsid):
+    if request.method == 'POST':
+        request_data = request.get_json()
+        print(request_data)
+        # tsID = request_data['timeslotID']
+        res_body = json.dumps(request_data)
+        print(type(request_data))
+        headers = {'Content-Type' : 'application/json'}
+
+        res = requests.post("http://project2_backend_1:5000/timeslots/<{}>/order".format(timeslotsid), data=res_body, headers=headers)
+        
+        
+        # with engine.connect() as con:
+        #     q_str = "SELECT snack FROM cinema WHERE LOWER(name) = LOWER('{}')".format(cinemaname)
+        #     rs = con.execute(q_str)
+        #     for _ in rs:
+        #         snack_str = _.snack
+        #         snack_list = snack_str.split(", ")
+    
+        return {"return": request_data}, 200
+
+@app.route('/timeslots/<timeslotsid>/orderUpdate', methods = ['POST'])
+def update_booking(timeslotsid):
+    if request.method == 'POST':
+        request_data = request.get_json()
+        usrname = request_data['username']
+        # for seat in request_data['ticket ID']:
+        with engine.connect() as con:
+            for tkid in request_data['ticket ID']:
+                q_str = "INSERT INTO booking(username, ticketid) VALUES('{}', {});".format(usrname, tkid)
+                con.execute(q_str)
+        return 200
+
 
 
 @app.before_first_request
