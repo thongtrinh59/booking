@@ -22,15 +22,26 @@ engine = create_engine('postgresql://root:root@dbbooking/main')
 Session = sessionmaker(bind = engine)
 session = Session()
 
-# create booking template
-@app.route('/test/<cinemaname>')
-def get_info_cinema(cinemaname):
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(100))
+    phone = db.Column(db.String(50))
+    email = db.Column(db.String(100))
 
-    with engine.connect() as con:
-        q_str = "SELECT * FROM cinema;"
-        rs = con.execute(q_str)
-        for _ in rs:
-            print(_)
+    
+class Booking(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    userid = db.Column(db.Integer)
+    ticketid = db.Column(db.Integer)
+    
+
+
+@app.before_first_request
+def create_tables():
+    print("---------------------------------------")
+    db.create_all()
+    db.session.commit()
+
 
 
 if __name__ == '__main__':
