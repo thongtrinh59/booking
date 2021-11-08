@@ -22,7 +22,7 @@ engine = create_engine('postgresql://root:root@dbbooking/main')
 Session = sessionmaker(bind = engine)
 session = Session()
 
-
+# create booking template
 @app.route('/test/<cinemaname>')
 def get_info_cinema(cinemaname):
 
