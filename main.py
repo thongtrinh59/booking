@@ -72,6 +72,33 @@ def update_booking(timeslotsid):
         return 200
 
 
+@app.route('/timeslots/<timeslotsid>/orderCancel', methods = ['POST'])
+def cancel_ticket(timeslotsid):
+    if request.method == 'POST':
+        request_data = request.get_json()
+        print(request_data)
+        # tsID = request_data['timeslotID']
+        res_body = json.dumps(request_data)
+        print(type(request_data))
+        headers = {'Content-Type' : 'application/json'}
+
+        res = requests.post("http://project2_backend_1:5000/timeslots/<{}>/order".format(timeslotsid), data=res_body, headers=headers)
+
+
+    
+        
+        usrname = request_data["username"]
+        with engine.connect() as con:
+            q_str = "DELETE FROM booking WHERE LOWER(username) = LOWER('{}');".format(usrname)
+            con.execute(q_str)
+            print("DELETED SUCCESS")
+        
+        print("RETURN OK")
+        return {"return": request_data}, 200
+
+
+
+
 
 @app.before_first_request
 def create_tables():
