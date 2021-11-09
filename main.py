@@ -83,9 +83,7 @@ def cancel_ticket(timeslotsid):
         headers = {'Content-Type' : 'application/json'}
 
         res = requests.post("http://project2_backend_1:5000/timeslots/<{}>/order".format(timeslotsid), data=res_body, headers=headers)
-
-
-    
+        
         
         usrname = request_data["username"]
         with engine.connect() as con:
